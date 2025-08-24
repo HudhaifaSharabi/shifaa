@@ -1,32 +1,21 @@
+from . import __version__ as app_version  # noqa
+
 app_name = "shifaa"
-app_title = "Shifaa"
-app_publisher = "simsaar soft"
-app_description = "Shifaa is a comprehensive healthcare management application for ERPNext.It provides modules and tools to manage patients, appointments, clinical procedures, laboratory, billing, and other healthcare operations with seamless integration into ERPNext."
-app_email = "info@simsaar.co"
-app_license = "mit"
-
-# Apps
-# ------------------
-
-# required_apps = []
-
-# Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "shifaa",
-# 		"logo": "/assets/shifaa/logo.png",
-# 		"title": "Shifaa",
-# 		"route": "/shifaa",
-# 		"has_permission": "shifaa.api.permission.has_app_permission"
-# 	}
-# ]
+app_title = "Marley Health"
+app_publisher = "earthians Health Informatics Pvt. Ltd."
+app_description = "Modern, Open Source HIS built on Frappe and ERPNext"
+app_icon = "octicon octicon-file-directory"
+app_color = "grey"
+app_email = "info@earthianslive.com"
+app_license = "GNU GPL V3"
+required_apps = ["erpnext"]
 
 # Includes in <head>
 # ------------------
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/shifaa/css/shifaa.css"
-# app_include_js = "/assets/shifaa/js/shifaa.js"
+app_include_js = "shifaa.bundle.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/shifaa/css/shifaa.css"
@@ -43,15 +32,10 @@ app_license = "mit"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {"Sales Invoice": "public/js/sales_invoice.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
-
-# Svg Icons
-# ------------------
-# include app icons in desk
-# app_include_icons = "shifaa/public/icons.svg"
 
 # Home Pages
 # ----------
@@ -74,38 +58,25 @@ app_license = "mit"
 # ----------
 
 # add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "shifaa.utils.jinja_methods",
-# 	"filters": "shifaa.utils.jinja_filters"
-# }
+jinja = {
+	"methods": [
+		"shifaa.shifaa.doctype.diagnostic_report.diagnostic_report.diagnostic_report_print",
+		"shifaa.shifaa.utils.generate_barcodes",
+		"shifaa.shifaa.doctype.observation.observation.get_observations_for_medical_record",
+	]
+}
 
 # Installation
 # ------------
 
 # before_install = "shifaa.install.before_install"
-# after_install = "shifaa.install.after_install"
+after_install = "shifaa.setup.setup_shifaa"
 
 # Uninstallation
 # ------------
 
-# before_uninstall = "shifaa.uninstall.before_uninstall"
-# after_uninstall = "shifaa.uninstall.after_uninstall"
-
-# Integration Setup
-# ------------------
-# To set up dependencies/integrations with other apps
-# Name of the app being installed is passed as an argument
-
-# before_app_install = "shifaa.utils.before_app_install"
-# after_app_install = "shifaa.utils.after_app_install"
-
-# Integration Cleanup
-# -------------------
-# To clean up dependencies/integrations with other apps
-# Name of the app being uninstalled is passed as an argument
-
-# before_app_uninstall = "shifaa.utils.before_app_uninstall"
-# after_app_uninstall = "shifaa.utils.after_app_uninstall"
+before_uninstall = "shifaa.uninstall.before_uninstall"
+after_uninstall = "shifaa.uninstall.after_uninstall"
 
 # Desk Notifications
 # ------------------
@@ -129,21 +100,43 @@ app_license = "mit"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+	"Sales Invoice": "shifaa.shifaa.custom_doctype.sales_invoice.ShifaaSalesInvoice",
+}
 
 # Document Events
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"*": {
+		"on_submit": "shifaa.shifaa.doctype.patient_history_settings.patient_history_settings.create_medical_record",
+		"on_cancel": "shifaa.shifaa.doctype.patient_history_settings.patient_history_settings.delete_medical_record",
+		"on_update_after_submit": "shifaa.shifaa.doctype.patient_history_settings.patient_history_settings.update_medical_record",
+	},
+	"Sales Invoice": {
+		"on_submit": "shifaa.shifaa.utils.manage_invoice_submit_cancel",
+		"on_cancel": "shifaa.shifaa.utils.manage_invoice_submit_cancel",
+		"validate": "shifaa.shifaa.utils.manage_invoice_validate",
+	},
+	"Company": {
+		"after_insert": "shifaa.shifaa.utils.create_shifaa_service_unit_tree_root",
+		"on_trash": "shifaa.shifaa.utils.company_on_trash",
+	},
+	"Patient": {
+		"after_insert": "shifaa.regional.india.abdm.utils.set_consent_attachment_details"
+	},
+}
+
+scheduler_events = {
+	"all": [
+		"shifaa.shifaa.doctype.patient_appointment.patient_appointment.send_appointment_reminder",
+	],
+	"daily": [
+		"shifaa.shifaa.doctype.patient_appointment.patient_appointment.update_appointment_status",
+		"shifaa.shifaa.doctype.fee_validity.fee_validity.update_validity_status",
+	],
+}
 
 # Scheduled Tasks
 # ---------------
@@ -169,7 +162,7 @@ app_license = "mit"
 # Testing
 # -------
 
-# before_tests = "shifaa.install.before_tests"
+before_tests = "shifaa.shifaa.utils.before_tests"
 
 # Overriding Methods
 # ------------------------------
@@ -187,22 +180,9 @@ app_license = "mit"
 
 # exempt linked doctypes from being automatically cancelled
 #
-# auto_cancel_exempted_doctypes = ["Auto Repeat"]
-
-# Ignore links to specified DocTypes when deleting documents
-# -----------------------------------------------------------
-
-# ignore_links_on_delete = ["Communication", "ToDo"]
-
-# Request Events
-# ----------------
-# before_request = ["shifaa.utils.before_request"]
-# after_request = ["shifaa.utils.after_request"]
-
-# Job Events
-# ----------
-# before_job = ["shifaa.utils.before_job"]
-# after_job = ["shifaa.utils.after_job"]
+auto_cancel_exempted_doctypes = [
+	"Inpatient Medication Entry",
+]
 
 # User Data Protection
 # --------------------
@@ -235,10 +215,82 @@ app_license = "mit"
 # 	"shifaa.auth.validate"
 # ]
 
-# Automatically update python controller files with type annotations for this app.
-# export_python_type_annotations = True
+global_search_doctypes = {
+	"Shifaa": [
+		{"doctype": "Patient", "index": 1},
+		{"doctype": "Medical Department", "index": 2},
+		{"doctype": "Vital Signs", "index": 3},
+		{"doctype": "Shifaa Practitioner", "index": 4},
+		{"doctype": "Patient Appointment", "index": 5},
+		{"doctype": "Shifaa Service Unit", "index": 6},
+		{"doctype": "Patient Encounter", "index": 7},
+		{"doctype": "Antibiotic", "index": 8},
+		{"doctype": "Diagnosis", "index": 9},
+		{"doctype": "Lab Test", "index": 10},
+		{"doctype": "Clinical Procedure", "index": 11},
+		{"doctype": "Inpatient Record", "index": 12},
+		{"doctype": "Sample Collection", "index": 13},
+		{"doctype": "Patient Medical Record", "index": 14},
+		{"doctype": "Appointment Type", "index": 15},
+		{"doctype": "Fee Validity", "index": 16},
+		{"doctype": "Practitioner Schedule", "index": 17},
+		{"doctype": "Dosage Form", "index": 18},
+		{"doctype": "Lab Test Sample", "index": 19},
+		{"doctype": "Prescription Duration", "index": 20},
+		{"doctype": "Prescription Dosage", "index": 21},
+		{"doctype": "Sensitivity", "index": 22},
+		{"doctype": "Complaint", "index": 23},
+		{"doctype": "Medical Code", "index": 24},
+	]
+}
 
-# default_log_clearing_doctypes = {
-# 	"Logging DocType Name": 30  # days to retain logs
-# }
+domains = {
+	"Shifaa": "shifaa.setup",
+}
 
+# nosemgrep
+standard_portal_menu_items = [
+	{
+		"title": "Personal Details",
+		"route": "/personal-details",
+		"reference_doctype": "Patient",
+		"role": "Patient",
+	},
+	{
+		"title": "Lab Test",
+		"route": "/lab-test",
+		"reference_doctype": "Lab Test",
+		"role": "Patient",
+	},
+	{
+		"title": "Prescription",
+		"route": "/prescription",
+		"reference_doctype": "Patient Encounter",
+		"role": "Patient",
+	},
+	{
+		"title": "Patient Appointment",
+		"route": "/patient-appointments",
+		"reference_doctype": "Patient Appointment",
+		"role": "Patient",
+	},
+]
+
+has_website_permission = {
+	"Lab Test": "shifaa.shifaa.web_form.lab_test.lab_test.has_website_permission",
+	"Patient Encounter": "shifaa.shifaa.web_form.prescription.prescription.has_website_permission",
+	"Patient Appointment": "shifaa.shifaa.web_form.patient_appointments.patient_appointments.has_website_permission",
+	"Patient": "shifaa.shifaa.web_form.personal_details.personal_details.has_website_permission",
+}
+
+standard_queries = {
+	"Shifaa Practitioner": "shifaa.shifaa.doctype.shifaa_practitioner.shifaa_practitioner.get_practitioner_list"
+}
+
+treeviews = [
+	"Shifaa Service Unit",
+]
+
+company_data_to_be_ignored = [
+	"Shifaa Service Unit",
+]

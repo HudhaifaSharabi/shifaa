@@ -1,6 +1,6 @@
 ### Shifaa
 
-Shifaa is a comprehensive healthcare management application for ERPNext.It provides modules and tools to manage patients, appointments, clinical procedures, laboratory, billing, and other healthcare operations with seamless integration into ERPNext.
+Shifaa is a comprehensive shifaa management application for ERPNext.It provides modules and tools to manage patients, appointments, clinical procedures, laboratory, billing, and other shifaa operations with seamless integration into ERPNext.
 
 ### Installation
 

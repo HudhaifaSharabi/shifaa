@@ -3,7 +3,7 @@ name = "shifaa"
 authors = [
     { name = "simsaar soft", email = "info@simsaar.co"}
 ]
-description = "Shifaa is a comprehensive healthcare management application for ERPNext.It provides modules and tools to manage patients, appointments, clinical procedures, laboratory, billing, and other healthcare operations with seamless integration into ERPNext."
+description = "Shifaa is a comprehensive shifaa management application for ERPNext.It provides modules and tools to manage patients, appointments, clinical procedures, laboratory, billing, and other shifaa operations with seamless integration into ERPNext."
 requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]
