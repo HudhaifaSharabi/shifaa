@@ -1,0 +1,11 @@
+<svg width="600" height="720" viewBox="0 0 600 720" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradL" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0099DD" />
+      <stop offset="100%" stop-color="#00BBFF" />
+    </linearGradient>
+  </defs>
+  <rect width="600" height="720" rx="40" fill="url(#gradL)" />
+  <rect x="180" y="180" width="240" height="240" rx="120" fill="rgba(255,255,255,0.12)" />
+  <rect x="140" y="420" width="320" height="180" rx="90" fill="rgba(255,255,255,0.1)" />
+</svg>
